@@ -8,6 +8,7 @@ import (
 
 	"github.com/funa1g/microservice-example/pkg/petshop/domain"
 	"github.com/labstack/echo"
+	"github.com/rs/zerolog/log"
 )
 
 type ResponseError struct {
@@ -32,10 +33,11 @@ func (p *PetHandler) GetList(c echo.Context) error {
 	if err != nil {
 		limit = 0
 	}
+
 	ctx := c.Request().Context()
 	pets, err := p.PUsecase.GetList(ctx, limit)
-
 	if err != nil {
+		log.Error().Msg(err.Error())
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
@@ -58,8 +60,10 @@ func (p *PetHandler) Store(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	err = p.PUsecase.Store(ctx, &pet)
 	if err != nil {
+		log.Error().Msg(err.Error())
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
+
 	return c.JSON(http.StatusCreated, pet)
 }
 
@@ -70,9 +74,9 @@ func (p *PetHandler) GetById(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-
 	pet, err := p.PUsecase.GetById(ctx, id)
 	if err != nil {
+		log.Error().Msg(err.Error())
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 

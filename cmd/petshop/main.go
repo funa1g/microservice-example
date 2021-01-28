@@ -3,11 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/url"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	_delivery "github.com/funa1g/microservice-example/pkg/petshop/delivery/http"
 	_repository "github.com/funa1g/microservice-example/pkg/petshop/repository/mysql"
@@ -15,7 +16,8 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello World!")
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Print("Start!")
 
 	dbHost := "localhost"
 	dbPort := "3306"
@@ -27,20 +29,20 @@ func main() {
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 	dbConn, err := sql.Open(`mysql`, dsn)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Error().Msg(err.Error())
 		return
 	}
 
 	err = dbConn.Ping()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Error().Msg(err.Error())
 		return
 	}
 
 	defer func() {
 		err := dbConn.Close()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal().Msg(err.Error())
 		}
 	}()
 
@@ -49,5 +51,5 @@ func main() {
 	tagRepo := _repository.NewTagRepository(dbConn)
 	petUseCase := _usecase.NewPetUsecase(petRepo, tagRepo)
 	_delivery.NewPetHandler(e, petUseCase)
-	e.Logger.Fatal(e.Start(":8080"))
+	log.Fatal().Msg(e.Start(":8080").Error())
 }

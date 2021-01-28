@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/funa1g/microservice-example/pkg/petshop/domain"
 )
@@ -27,9 +26,7 @@ func (pu *petUsecase) GetList(ctx context.Context, limit int) ([]domain.Pet, err
 }
 
 func (pu *petUsecase) Store(ctx context.Context, p *domain.Pet) error {
-	fmt.Println(p.Tag)
 	tag, err := pu.tagRepo.GetByName(ctx, p.Tag)
-	fmt.Println(tag)
 	if err != nil {
 		tag := &domain.Tag{
 			Name: p.Name,

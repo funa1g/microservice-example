@@ -3,7 +3,8 @@ package mysql
 import (
 	"context"
 	"database/sql"
-	"fmt"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/funa1g/microservice-example/pkg/petshop/domain"
 )
@@ -25,7 +26,7 @@ func (tr *tagRepository) fetch(ctx context.Context, query string, args ...interf
 	defer func() {
 		errRow := rows.Close()
 		if errRow != nil {
-			fmt.Println("error")
+			log.Error().Msg(errRow.Error())
 		}
 	}()
 
