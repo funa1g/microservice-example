@@ -9,9 +9,9 @@ type Pet struct {
 }
 
 type PetOrigin struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name" validate:"required"`
-	TagId int    `json:"tag_id"`
+	ID    int
+	Name  string
+	TagId int
 }
 
 type PetUsecase interface {
