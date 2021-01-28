@@ -46,13 +46,13 @@ func (p *PetHandler) Store(c echo.Context) (err error) {
 	var pet domain.Pet
 	err = c.Bind(&pet)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return c.JSON(http.StatusBadRequest, ResponseError{Message: err.Error()})
 	}
 
 	validate := validator.New()
 	err = validate.Struct(pet)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, ResponseError{Message: err.Error()})
 	}
 
 	ctx := c.Request().Context()
