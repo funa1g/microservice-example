@@ -29,13 +29,14 @@ func (pu *petUsecase) Store(ctx context.Context, p *domain.Pet) (domain.Pet, err
 	tag, err := pu.tagRepo.GetByName(ctx, p.Tag)
 	if err != nil {
 		tag := &domain.Tag{
-			Name: p.Name,
+			Name: p.Tag,
 		}
 		err = pu.tagRepo.Store(ctx, tag)
 		if err != nil {
 			return domain.Pet{}, domain.ErrBadParamInput
 		}
 	}
+
 	petOrigin := &domain.PetOrigin{
 		Name:  p.Name,
 		TagId: tag.ID,

@@ -50,14 +50,27 @@ func (pr *petRepository) GetList(ctx context.Context, limit int) ([]domain.Pet, 
 }
 
 func (pr *petRepository) Store(ctx context.Context, p *domain.PetOrigin) (int64, error) {
-	query := `INSERT INTO pets (name, tag_id) VALUES (?, ?)`
-	stmt, err := pr.Conn.PrepareContext(ctx, query)
-	if err != nil {
-		return 0, optimizeError(err)
-	}
-	res, err := stmt.ExecContext(ctx, p.Name, p.TagId)
-	if err != nil {
-		return 0, optimizeError(err)
+	var res sql.Result
+	if p.TagId != 0 {
+		query := `INSERT INTO pets (name, tag_id) VALUES (?, ?)`
+		stmt, err := pr.Conn.PrepareContext(ctx, query)
+		if err != nil {
+			return 0, optimizeError(err)
+		}
+		res, err = stmt.ExecContext(ctx, p.Name, p.TagId)
+		if err != nil {
+			return 0, optimizeError(err)
+		}
+	} else {
+		query := `INSERT INTO pets (name) VALUES (?)`
+		stmt, err := pr.Conn.PrepareContext(ctx, query)
+		if err != nil {
+			return 0, optimizeError(err)
+		}
+		res, err = stmt.ExecContext(ctx, p.Name)
+		if err != nil {
+			return 0, optimizeError(err)
+		}
 	}
 	return res.LastInsertId()
 }
