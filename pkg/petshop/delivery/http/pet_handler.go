@@ -85,12 +85,8 @@ func getStatusCode(err error) int {
 	}
 
 	switch err {
-	// case domain.ErrInternalServerError:
-	// 	return http.StatusInternalServerError
-	// case domain.ErrNotFound:
-	// 	return http.StatusNotFound
-	// case domain.ErrConflict:
-	// 	return http.StatusConflict
+	case domain.ErrNotFound:
+		return http.StatusNotFound
 	default:
 		return http.StatusInternalServerError
 	}

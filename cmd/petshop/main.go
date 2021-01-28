@@ -9,9 +9,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 
-	_petHttpDelivery "github.com/funa1g/microservice-example/pkg/petshop/pet/delivery/http"
-	_petRepository "github.com/funa1g/microservice-example/pkg/petshop/pet/repository/mysql"
-	_petUsecase "github.com/funa1g/microservice-example/pkg/petshop/pet/usecase"
+	_delivery "github.com/funa1g/microservice-example/pkg/petshop/delivery/http"
+	_repository "github.com/funa1g/microservice-example/pkg/petshop/repository/mysql"
+	_usecase "github.com/funa1g/microservice-example/pkg/petshop/usecase"
 )
 
 func main() {
@@ -45,8 +45,9 @@ func main() {
 	}()
 
 	e := echo.New()
-	petRepo := _petRepository.NewPetRepository(dbConn)
-	petUseCase := _petUsecase.NewPetUsecase(petRepo, nil)
-	_petHttpDelivery.NewPetHandler(e, petUseCase)
+	petRepo := _repository.NewPetRepository(dbConn)
+	tagRepo := _repository.NewTagRepository(dbConn)
+	petUseCase := _usecase.NewPetUsecase(petRepo, tagRepo)
+	_delivery.NewPetHandler(e, petUseCase)
 	e.Logger.Fatal(e.Start(":8080"))
 }
