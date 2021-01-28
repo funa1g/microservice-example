@@ -28,7 +28,7 @@ func (pu *petUsecase) GetList(ctx context.Context, limit int) ([]domain.Pet, err
 
 func (pu *petUsecase) Store(ctx context.Context, p *domain.Pet) error {
 	fmt.Println(p.Tag)
-	tag, err := pu.tagRepo.GetByName(ctx, p.Name)
+	tag, err := pu.tagRepo.GetByName(ctx, p.Tag)
 	fmt.Println(tag)
 	if err != nil {
 		tag := &domain.Tag{
