@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	_delivery "github.com/funa1g/microservice-example/pkg/petshop/delivery/http"
+	"github.com/funa1g/microservice-example/pkg/petshop/delivery/http/middleware"
 	_repository "github.com/funa1g/microservice-example/pkg/petshop/repository/mysql"
 	_usecase "github.com/funa1g/microservice-example/pkg/petshop/usecase"
 )
@@ -19,6 +20,28 @@ func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Print("Start!")
 
+	dbConn := initDbConn()
+	if dbConn == nil {
+		return
+	}
+	defer func() {
+		err := dbConn.Close()
+		if err != nil {
+			log.Fatal().Msg(err.Error())
+		}
+	}()
+
+	e := echo.New()
+	m := middleware.HttpMiddleware{}
+	e.Use(m.CORS)
+	petRepo := _repository.NewPetRepository(dbConn)
+	tagRepo := _repository.NewTagRepository(dbConn)
+	petUseCase := _usecase.NewPetUsecase(petRepo, tagRepo)
+	_delivery.NewPetHandler(e, petUseCase)
+	log.Fatal().Msg(e.Start(":8080").Error())
+}
+
+func initDbConn() *sql.DB {
 	dbHost := "localhost"
 	dbPort := "3306"
 	dbUser := "root"
@@ -30,26 +53,14 @@ func main() {
 	dbConn, err := sql.Open(`mysql`, dsn)
 	if err != nil {
 		log.Error().Msg(err.Error())
-		return
+		return nil
 	}
 
 	err = dbConn.Ping()
 	if err != nil {
 		log.Error().Msg(err.Error())
-		return
+		return nil
 	}
 
-	defer func() {
-		err := dbConn.Close()
-		if err != nil {
-			log.Fatal().Msg(err.Error())
-		}
-	}()
-
-	e := echo.New()
-	petRepo := _repository.NewPetRepository(dbConn)
-	tagRepo := _repository.NewTagRepository(dbConn)
-	petUseCase := _usecase.NewPetUsecase(petRepo, tagRepo)
-	_delivery.NewPetHandler(e, petUseCase)
-	log.Fatal().Msg(e.Start(":8080").Error())
+	return dbConn
 }

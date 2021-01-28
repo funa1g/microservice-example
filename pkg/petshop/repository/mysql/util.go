@@ -8,6 +8,9 @@ import (
 )
 
 func optimizeError(err error) error {
+	if err == nil {
+		return nil
+	}
 	if strings.Contains(err.Error(), "Error 1062") {
 		return domain.ErrDuplicateEntry
 	}
