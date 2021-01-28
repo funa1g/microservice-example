@@ -20,7 +20,7 @@ func NewTagRepository(Conn *sql.DB) domain.TagRepository {
 func (tr *tagRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Tag, err error) {
 	rows, err := tr.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, optimizeError(err)
 	}
 
 	defer func() {
@@ -46,17 +46,17 @@ func (tr *tagRepository) Store(ctx context.Context, t *domain.Tag) error {
 	query := `INSERT INTO tags (name) VALUES (?)`
 	stmt, err := tr.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		return err
+		return optimizeError(err)
 	}
 	_, err = stmt.ExecContext(ctx, t.Name)
-	return err
+	return optimizeError(err)
 }
 
 func (tr *tagRepository) GetByName(ctx context.Context, name string) (t domain.Tag, err error) {
 	query := `SELECT id, name FROM tags WHERE name = ?`
 	list, err := tr.fetch(ctx, query, name)
 	if err != nil {
-		return domain.Tag{}, err
+		return domain.Tag{}, optimizeError(err)
 	}
 	if len(list) > 0 {
 		t = list[0]

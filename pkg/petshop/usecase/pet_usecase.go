@@ -25,7 +25,7 @@ func (pu *petUsecase) GetList(ctx context.Context, limit int) ([]domain.Pet, err
 	return pu.petRepo.GetList(ctx, limit)
 }
 
-func (pu *petUsecase) Store(ctx context.Context, p *domain.Pet) error {
+func (pu *petUsecase) Store(ctx context.Context, p *domain.Pet) (domain.Pet, error) {
 	tag, err := pu.tagRepo.GetByName(ctx, p.Tag)
 	if err != nil {
 		tag := &domain.Tag{
@@ -33,12 +33,24 @@ func (pu *petUsecase) Store(ctx context.Context, p *domain.Pet) error {
 		}
 		err = pu.tagRepo.Store(ctx, tag)
 		if err != nil {
-			return domain.ErrBadParamInput
+			return domain.Pet{}, domain.ErrBadParamInput
 		}
 	}
-	p.TagId = tag.ID
+	petOrigin := &domain.PetOrigin{
+		Name:  p.Name,
+		TagId: tag.ID,
+	}
 
-	return pu.petRepo.Store(ctx, p)
+	id, err := pu.petRepo.Store(ctx, petOrigin)
+	if err != nil {
+		return domain.Pet{}, err
+	}
+	pet := domain.Pet{
+		ID:   int(id),
+		Name: p.Name,
+		Tag:  p.Tag,
+	}
+	return pet, nil
 }
 
 func (pu *petUsecase) GetById(ctx context.Context, id int) (domain.Pet, error) {

@@ -58,13 +58,13 @@ func (p *PetHandler) Store(c echo.Context) (err error) {
 	}
 
 	ctx := c.Request().Context()
-	err = p.PUsecase.Store(ctx, &pet)
+	res, err := p.PUsecase.Store(ctx, &pet)
 	if err != nil {
 		log.Error().Msg(err.Error())
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, pet)
+	return c.JSON(http.StatusCreated, res)
 }
 
 func (p *PetHandler) GetById(c echo.Context) error {
@@ -89,6 +89,8 @@ func getStatusCode(err error) int {
 	}
 
 	switch err {
+	case domain.ErrDuplicateEntry, domain.ErrBadParamInput:
+		return http.StatusBadRequest
 	case domain.ErrNotFound:
 		return http.StatusNotFound
 	default:
