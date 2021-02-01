@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option go_package = "github.com/funa1g/microservice-example/pkg/delivery";
+
+package petshop;
+
+service Petshop {
+    rpc GetPetList (GetPetListRequest) returns (PetListResponse) {}
+    rpc PostPet (PostPetRequest) returns (PetResponse) {}
+    rpc GetPetById (GetPetRequest) returns (PetResponse) {}
+}
+
+message GetPetListRequest {
+    int32 limit = 1;
+}
+
+message PostPetRequest {
+    string name = 1;
+    string tag = 2;
+}
+
+message GetPetRequest {
+    int32 id = 1;
+}
+
+message PetListResponse {
+    repeated PetResponse results = 1;
+}
+
+message PetResponse {
+    int32 id = 1;
+    string name = 2;
+    string tag = 3;
+}
