@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	pb "github.com/funa1g/microservice-example/pkg/petshop/delivery"
+	pb "github.com/funa1g/microservice-example/api/petshop"
 	"github.com/funa1g/microservice-example/pkg/petshop/domain"
 )
 
